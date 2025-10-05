@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Strona Główna - Monitor Jakości Powietrza{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+    {% if source == "api" %}
+        <h1 class="mb-4">Stacje pomiarowe: API</h1>
+    {% elif source == "db" %}
+        <h1 class="mb-4">Stacje pomiarowe: Baza danych</h1>
+    {% endif %}
+
+
+    <!-- Formularze wyszukiwania -->
+    <form method="get" action="{{ url_for('stations.stations_list') }}" class="row g-2 mb-3">
+        <div class="col-auto">
+            <input type="text" name="city" class="form-control" placeholder="Wpisz nazwę miasta" value="{{ request.args.get('city', '') }}">
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Szukaj po mieście</button>
+        </div>
+    </form>
+
+
+    <!-- Zakładki -->
+    <ul class="nav nav-tabs mb-3" id="stationsTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="list-tab" data-bs-toggle="tab" data-bs-target="#list" type="button" role="tab">Lista</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="map-tab" data-bs-toggle="tab" data-bs-target="#map" type="button" role="tab">Mapa</button>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="list" role="tabpanel">
+            <table class="table table-bordered table-striped">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Kod</th>
+                        <th>Nazwa</th>
+                        <th>Miasto</th>
+                        <th>Województwo</th>
+                        <th>Detale</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for station in stations %}
+                    <tr>
+                        <td>{{ station.id }}</td>
+                        <td>{{ station.stationCode }}</td>
+                        <td>{{ station.stationName }}</td>
+                        <td>{{ station.city.name if station.city }}</td>
+                        <td>{{ station.city.gmina.wojewodztwoName }}</td>
+                        <td>
+                            {% if source == "api" %}
+                                <a class="details-btn" href="{{ url_for('stations.station_detail', station_id=station.id) }}">
+                                    Details
+                                </a>
+                            {% elif source == "db" %}
+                                <a class="details-btn" href="{{ url_for('stations.station_detail_archive', station_id=station.id) }}">
+                                    Details
+                                </a>
+                            {% endif %}
+
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="tab-pane fade" id="map" role="tabpanel">
+
+        <form method="get" action="{{ url_for('stations.stations_nearby') }}" class="row g-2 mb-4">
+            <div class="col-auto">
+                <input type="text" name="location" class="form-control" placeholder="Lokalizacja" value="{{ request.args.get('location', '') }}">
+            </div>
+            <div class="col-auto">
+                <input type="number" step="0.1" name="radius" class="form-control" placeholder="Promień w km" value="{{ request.args.get('radius', '') }}">
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">Szukaj w promieniu</button>
+            </div>
+        </form>
+            <div class="d-flex justify-content-center">
+                {{ map_html|safe }}
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

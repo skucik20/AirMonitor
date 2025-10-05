@@ -1,0 +1,62 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+
+# ---- Flask specific ----
+instance/
+*.db
+*.sqlite3
+*.sqlite
+*.log
+
+# ---- Virtual environments ----
+venv/
+env/
+ENV/
+.venv/
+.python-version
+
+# ---- Configuration & secrets ----
+*.env
+*.flaskenv
+.env.*
+secrets.json
+config.json
+
+# ---- IDE / Editor ----
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ---- Byte-compiled / C extensions ----
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# ---- OS specific ----
+.DS_Store
+Thumbs.db
+
+# ---- Unit test / coverage ----
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+.pytest_cache/
+nosetests.xml
+coverage.xml
+
+# ---- Jupyter Notebooks ----
+.ipynb_checkpoints/
+
+# ---- Docker ----
+*.pid
+*.log
+docker-compose.override.yml

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Strona Główna - Monitor Jakości Powietrza{% endblock %}
+
+{% block content %}
+
+  <div class="container vh-100 d-flex justify-content-center align-items-center">
+    <div class="text-center">
+      <h1 class="display-4 mb-4">🌍 Monitor Jakości Powietrza</h1>
+      <p class="lead mb-5">Wybierz rodzaj danych, które chcesz przejrzeć:</p>
+
+      <div class="row g-3 justify-content-center">
+        <div class="col-md-4">
+          <a href="{{ url_for('stations.list_stations') }}" class="btn btn-success btn-lg w-100 shadow">
+            Dane na żywo
+          </a>
+        </div>
+        <div class="col-md-4">
+          <a href="{{ url_for('stations.list_stations_archive') }}" class="btn btn-primary btn-lg w-100 shadow">
+            Dane archiwalne
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

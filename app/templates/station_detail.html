@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block title %}Strona Główna - Monitor Jakości Powietrza{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h1 class="mb-3">Stacja: {{ station.stationName }}</h1>
+
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card mb-4">
+          <div class="card-header">
+            Informacje dotyczące stacji pomiarowej
+          </div>
+          <div class="card-body">
+            <p class="mb-1"><strong>Województwo:</strong> {{ station.city.gmina.wojewodztwoName }}</p>
+            <p class="mb-1"><strong>Powiat:</strong> {{ station.city.gmina.powiatName }}</p>
+            <p class="mb-1"><strong>Gmina:</strong> {{ station.city.gmina.gminaName }}</p>
+            <p class="mb-1"><strong>Miasto:</strong> {{ station.city.name }}</p>
+            <p class="mb-1"><strong>Adres:</strong> {{ station.addressStreet }}</p>
+            <p class="mb-0"><strong>ID:</strong> {{ station.id }}</p>
+          </div>
+        </div>
+      </div>
+
+        {% if source == "api" %}
+        <div class="col-md-6">
+        <div class="card mb-4">
+          <div class="card-header">
+            AQI
+          </div>
+          <div class="card-body">
+            <p class="mb-1"><strong>Data wykonania obliczeń indeksu:</strong> {{ aqi.calculation_date }}</p>
+            <p class="mb-1"><strong>Wartość indeksu:</strong> {{ aqi.index_value }}</p>
+              <div class="d-flex align-items-center gap-2">
+                  <p class="mb-1"><strong>Nazwa kategorii indeksu:</strong> {{ aqi.index_category }}</p>
+                  <div class="
+                           {% if aqi.index_category in ['Dobry', 'Bardzo dobry'] %}
+                              bg-success text-white
+                           {% elif aqi.index_category == 'Umiarkowany' %}
+                              bg-warning text-white
+                           {% elif aqi.index_category == 'Dostateczny' %}
+                              bg-orange text-white
+                           {% elif aqi.index_category == ['Zły', 'Bardzo zły'] %}
+                              bg-danger text-white
+                           {% elif aqi.index_category == ['Brak indeksu', 'None'] %}
+                              bg-secondary text-white
+                           {% endif %}
+                        " style=" width: 16px;height: 16px;border-radius: 50%;">
+                  </div>
+            </div>
+          </div>
+        </div>
+      </div>
+        {% endif %}
+
+
+    </div>
+
+    {% if source == "api" %}
+        <a href="{{ url_for('stations.list_stations') }}" class="btn btn-secondary mb-3">⟵ Powrót do listy</a>
+    {% elif source == "db" %}
+        <a href="{{ url_for('stations.list_stations_archive') }}" class="btn btn-secondary mb-3">⟵ Powrót do listy</a>
+    {% endif %}
+
+    <div class="card mb-4">
+          <div class="card-header">
+            {% if source == "api" %}
+                Tabela zestawiająca pomiary dla poszczególnych czujników
+            {% elif source == "db" %}
+                Tabela zestawiająca archiwalne pomiary dla poszczególnych czujników
+            {% endif %}
+          </div>
+        <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead class="table-light">
+                <tr>
+                    <th>Id stanowiska</th>
+<!--                    <th>Id stacji</th>-->
+                    <th>Wskaźnik</th>
+                    <th>Wskaźnik wzór</th>
+<!--                    <th>Wskaźnik kod</th>-->
+                    <th>Id wskaźnika</th>
+                    <th>Pomiar</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                {% for sensor in sensors %}
+                <tr>
+                    <td>{{ sensor.id_stanowiska }}</td>
+<!--                    <td>{{ sensor.id_stacji }}</td>-->
+                    <td>{{ sensor.wskaznik }}</td>
+                    <td>{{ sensor.wskaznik_wzor }}</td>
+<!--                    <td>{{ sensor.wskaznik_kod }}</td>-->
+                    <td>{{ sensor.id_wskaznika }}</td>
+                    <td>
+                        {% if source == "api" %}
+                            <a class="btn btn-primary btn-sm" href="{{ url_for('stations.sensor_detail', station_id=station.id, sensor_id=sensor.id_stanowiska) }}">
+                                Pomiar
+                            </a>
+                        {% elif source == "db" %}
+                            <a class="btn btn-primary btn-sm" href="{{ url_for('stations.sensor_detail_archive', station_id=station.id, sensor_id=sensor.id_stanowiska) }}">
+                                Pomiar
+                            </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    </div>
+
+    {% if source == "db" %}
+    <div class="card mb-4">
+          <div class="card-header">
+            Tabela danych archiwalnych Air Quality Index (AQI) dla stacji {{ station.stationName }}
+          </div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead class="table-light">
+                    <tr>
+                        <th>Id</th>
+                        <th>Data wykonania obliczeń indeksu</th>
+                        <th>Wartość indeksu</th>
+                        <th>Nazwa kategorii indeksu</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for station_index in station_indexes %}
+                    <tr>
+                        <td>{{ station_index.id }}</td>
+                        <td>{{ station_index.calculation_date }}</td>
+                        <td>{{ station_index.index_value }}</td>
+                        <td class="
+                           {% if station_index.index_category in ['Dobry', 'Bardzo dobry'] %}
+                              bg-success text-white
+                           {% elif station_index.index_category == 'Umiarkowany' %}
+                              bg-warning text-white
+                           {% elif station_index.index_category == 'Dostateczny' %}
+                              bg-orange text-white
+                           {% elif station_index.index_category == ['Zły', 'Bardzo zły'] %}
+                              bg-danger text-white
+                           {% elif station_index.index_category == ['Brak indeksu', 'None'] %}
+                              bg-secondary text-white
+                           {% endif %}
+                        ">
+                            {{ station_index.index_category }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {% endif %}
+</div>
+{% endblock %}
